@@ -1,0 +1,13 @@
+{
+  "name": "CKB Testnet Faucet",
+  "description": "CKB Testnet Faucet",
+  "keywords": [
+    "blockchain",
+    "CKB"
+  ],
+  "scripts": {
+    "dokku": {
+      "predeploy": "bundle exec rails db:migrate"
+    }
+  }
+}
