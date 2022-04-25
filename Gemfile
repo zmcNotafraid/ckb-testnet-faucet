@@ -36,16 +36,8 @@ gem "ckb-sdk-ruby", git: "https://github.com/nervosnetwork/ckb-sdk-ruby.git", re
 # Redis
 gem "hiredis", "~> 0.6.1"
 gem "redis", "~> 4.0", ">= 4.0.3"
-
-gem "ruby-progressbar", require: false
 gem "rack-attack"
 
-# Deployment
-gem "mina", require: false
-gem "mina-multistage", require: false
-gem "mina-whenever", require: false
-
-gem "whenever", require: false
 gem "fast_jsonapi"
 
 group :development, :test do
