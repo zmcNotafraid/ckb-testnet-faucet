@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :claim_event do
     address_hash do
-      script = CKB::Types::Script.new(code_hash: "#{Rails.application.credentials.SECP_CELL_TYPE_HASH}", args: "0x#{SecureRandom.hex(20)}", hash_type: "type")
+      script = CKB::Types::Script.new(code_hash: "#{ENV['SECP_CELL_TYPE_HASH']}", args: "0x#{SecureRandom.hex(20)}", hash_type: "type")
 
       CKB::Address.new(script, mode: CKB::MODE::TESTNET).generate
     end
