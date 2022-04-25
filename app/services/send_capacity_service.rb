@@ -39,7 +39,7 @@ class SendCapacityService
 
     def handle_state_change(pending_events, tx)
       puts tx.inspect
-      return if tx.tx_status.status == "pending"
+      return if tx.tx_status.status == "pending" or  tx.tx_status.status == 'unknown'
 
       if tx.tx_status.status == "committed"
         pending_events.map { |pending_event| pending_event.processed! }
