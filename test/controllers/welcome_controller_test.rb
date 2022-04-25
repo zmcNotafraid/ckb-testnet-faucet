@@ -12,7 +12,7 @@ class WelcomeControllerTest < ActionDispatch::IntegrationTest
   test "should render Welcome component" do
     account = Account.official_account
     official_account = { addressHash: account.address_hash, balance: account.ckb_balance.to_s }
-    aggron_explorer_host = Rails.application.credentials.AGGRON_EXPLORER_HOST
+    aggron_explorer_host = ENV['AGGRON_EXPLORER_HOST']
 
     get root_url
 

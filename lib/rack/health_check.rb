@@ -55,13 +55,13 @@ module Rack
       end
 
       def rpc_connected?
-        CKB::API.new(host: Rails.application.credentials.CKB_NODE_URL).present? rescue false
+        CKB::API.new(host: ENV['CKB_NODE_URL']).present? rescue false
       end
 
       def allowed_ip?(remote_ip)
-        return true unless Rails.application.credentials.ENABLE_ALLOWED_IPS
+        return true unless ENV['ENABLE_ALLOWED_IPS']
 
-        allowed_ips = %w[127.0.0.1 ::1].concat(Rails.application.credentials.ALLOWED_IPS || [])
+        allowed_ips = %w[127.0.0.1 ::1].concat(ENV['ALLOWED_IPS'] || [])
         allowed_ips.include?(remote_ip)
       end
 

@@ -7,14 +7,14 @@ class SdkApi
 
   attr_reader :api, :indexer_api
   def initialize
-    @api = CKB::API.new(host: Rails.application.credentials.CKB_NODE_URL)
-    @indexer_api = CKB::Indexer::API.new(Rails.application.credentials.CKB_INDEXER_URL)
+    @api = CKB::API.new(host: ENV['CKB_NODE_URL'])
+    @indexer_api = CKB::Indexer::API.new(ENV['CKB_INDEXER_URL'])
     setup_sdk_config
   end
 
   def setup_sdk_config
     config = CKB::Config.instance
-    config.set_api(Rails.application.credentials.CKB_NODE_URL)
+    config.set_api(ENV['CKB_NODE_URL'])
   end
 
   METHOD_NAMES.each do |name|

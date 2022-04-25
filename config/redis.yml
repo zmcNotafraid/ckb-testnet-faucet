@@ -1,6 +1,5 @@
 defaults: &defaults
-  url: <%= Rails.application.credentials.REDIS[:URL] %>
-  password: <%= Rails.application.credentials.REDIS[:PASSWORD] %>
+  url: <%= ENV['REDIS_URL'] %>
 
 development:
   <<: *defaults
