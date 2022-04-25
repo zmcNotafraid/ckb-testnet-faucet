@@ -38,6 +38,7 @@ class SendCapacityService
     end
 
     def handle_state_change(pending_events, tx)
+      puts tx.inspect
       return if tx.tx_status.status == "pending"
 
       if tx.tx_status.status == "committed"
