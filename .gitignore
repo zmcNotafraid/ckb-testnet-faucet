@@ -22,8 +22,6 @@ TAGS
 /storage/*
 !/storage/.keep
 
-config/database.yml
-
 /public/assets
 .byebug_history
 
