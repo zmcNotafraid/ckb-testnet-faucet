@@ -182,7 +182,7 @@ const Welcome: React.FC<WelcomeProps> = ({
               xl="5"
               className="justify-content-center content-container"
             >
-              <h1>Nervos Aggron Faucet</h1>
+              <h1>Nervos Pudge Faucet</h1>
             </Col>
           </Row>
           <Row className="justify-content-center align-items-center">
