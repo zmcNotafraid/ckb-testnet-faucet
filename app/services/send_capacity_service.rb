@@ -5,7 +5,7 @@ class SendCapacityService
     ClaimEvent.transaction do
       pending_events = ClaimEvent.order(:id).pending.limit(100).group_by(&:tx_hash)
       return if pending_events.blank?
-
+      puts pending_events.count
       pending_events.each do |tx_hash, events|
         if tx_hash.present?
           tx = api.get_transaction(tx_hash)
@@ -13,11 +13,13 @@ class SendCapacityService
           if tx.present?
             handle_state_change(events, tx)
           else
-            next if pending_events.keys.compact.size > 1
+            # next if pending_events.keys.compact.size > 1
             handle_send_capacity(events)
           end
         else
-          next if pending_events.keys.compact.size > 1
+          # puts pending_events.keys.compact
+          # next if pending_events.keys.compact.size > 1
+          # puts 'bbbb'
           handle_send_capacity(events)
         end
       end
@@ -59,12 +61,18 @@ class SendCapacityService
         end
         memo
       end
+      puts to_infos
       tx_generator = ckb_wallet.advance_generate(to_infos: to_infos)
       tx = ckb_wallet.sign(tx_generator, ENV['OFFICIAL_WALLET_PRIVATE_KEY'])
+      puts tx&.to_h.inspect      
       tx_hash = api.send_transaction(tx, "passthrough")
       pending_events.map { |pending_event| pending_event.update!(tx_hash: tx_hash, tx_status: "pending", fee: tx_fee(tx)) }
-    rescue CKB::RPCError => e
-      puts e
+    # rescue CKB::RPCError => e
+    #   puts e
+
+
+    #   puts e.backtrace.join("\n")
+    #   binding.pry
     end
 
     def tx_fee(tx)
