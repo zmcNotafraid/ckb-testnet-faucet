@@ -7,7 +7,7 @@ CKB is the layer 1 of Nervos Network, a public/permissionless blockchain. CKB us
 [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/shaojunda/ckb-testnet-faucet/blob/develop/LICENSE)
 [![Telegram Group](https://cdn.rawgit.com/Patrolavia/telegram-badge/8fe3382b/chat.svg)](https://t.me/nervos_ckb_dev)
 
-CKB Testnet Faucet is a [Testnet Aggron](https://github.com/nervosnetwork/ckb#join-a-network) faucet built with React and Ruby on Rails.
+CKB Testnet Faucet is a [Testnet Pudge](https://github.com/nervosnetwork/ckb#join-a-network) faucet built with React and Ruby on Rails.
 
 It supports claim ckb testnet tokens.
 
@@ -43,7 +43,7 @@ OFFICIAL_WALLET_PRIVATE_KEY: "your private key"
 SECP_CELL_TYPE_HASH: "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8"
 ALLOWED_IPS:
   - 127.0.0.1
-AGGRON_EXPLORER_HOST: "https://explorer.nervos.org/aggron"
+TESTNET_EXPLORER_HOST: "https://pudge.explorer.nervos.org/"
 secret_key_base: "your secret key base"
 ```
 

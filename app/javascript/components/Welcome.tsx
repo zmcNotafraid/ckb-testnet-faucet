@@ -46,7 +46,7 @@ const Welcome: React.FC<WelcomeProps> = ({
           )
         });
       })
-      .catch(error => {});
+      .catch(error => { });
   };
 
   useSWR("/claim_events", fetchClaimEvents, { refreshInterval: 5000 })
@@ -154,7 +154,7 @@ const Welcome: React.FC<WelcomeProps> = ({
           })
         });
       })
-      .catch(error => {});
+      .catch(error => { });
 
     event.preventDefault();
   };
@@ -193,7 +193,7 @@ const Welcome: React.FC<WelcomeProps> = ({
               xl="5"
               className="justify-content-center content-container"
             >
-              <p>Claim testnet 50000 CKB from the faucet once every 24 hours</p>
+              <p>Claim testnet 10000 CKB from the faucet once every 24 hours</p>
             </Col>
           </Row>
           <Row className="justify-content-center align-items-center">

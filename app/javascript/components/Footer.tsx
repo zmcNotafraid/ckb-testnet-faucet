@@ -77,7 +77,7 @@ const Footer: React.FC = () => {
                     </a>
 
                     <a
-                      href="https://explorer.nervos.org/aggron/"
+                      href="https://pudge.explorer.nervos.org/"
                       target="_blank"
                       className="footer-item-container d-flex justify-content-center align-items-center"
                     >

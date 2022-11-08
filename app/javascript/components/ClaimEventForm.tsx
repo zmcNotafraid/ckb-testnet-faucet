@@ -19,9 +19,9 @@ const ClaimEventForm: React.FC<ClaimEventFormProps> = ({
     <Form noValidate onSubmit={handleSubmit}>
       <InputGroup className="mb-3">
         <FormControl
-          placeholder="Enter your Aggron wallet address"
-          aria-label="Aggron address"
-          aria-describedby="Enter your Aggron wallet address"
+          placeholder="Enter your Pudge wallet address"
+          aria-label="Pudge address"
+          aria-describedby="Enter your Pudge wallet address"
           name="address_hash"
           value={addressHash}
           onChange={handleInput}
