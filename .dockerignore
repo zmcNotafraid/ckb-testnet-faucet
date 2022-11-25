@@ -1,0 +1,15 @@
+.git
+.github
+log
+test
+tmp
+
+.dockerignore
+Dockerfile
+
+README.md
+LICENSE
+CONTRIBUTING.md
+
+node_modules
+npm-debug.log
