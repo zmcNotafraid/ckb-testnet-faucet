@@ -3,7 +3,7 @@
 class SendCapacityService
   def call
     ClaimEvent.transaction do
-      pending_events = ClaimEvent.order(:id).pending.limit(100).group_by(&:tx_hash)
+      pending_events = ClaimEvent.order(:id => :desc).pending.limit(100).group_by(&:tx_hash)
       return if pending_events.blank?
       puts pending_events.count
       pending_events.each do |tx_hash, events|
