@@ -53,7 +53,7 @@ class ClaimEventValidator < ActiveModel::Validator
     end
 
     def only_claim_once_every_24h(record)
-      if ClaimEvent.where(address_hash: record.address_hash).h24.exists?
+      if ClaimEvent.where.not(tx_status: 'rejected').where(address_hash: record.address_hash).h24.exists?
         record.errors.add(:address_hash, "An address can only be claimed once every 24 hours.")
       end
     end
