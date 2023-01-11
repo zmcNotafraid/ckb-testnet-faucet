@@ -3,7 +3,7 @@
 class SendCapacityService
   def call
     ClaimEvent.transaction do
-      pending_events = ClaimEvent.order(:id => :desc).pending.limit(100).group_by(&:tx_hash)
+      pending_events = ClaimEvent.order(id: :desc).pending.limit(100).group_by(&:tx_hash)
       return if pending_events.blank?
       puts pending_events.count
       pending_events.each do |tx_hash, events|
@@ -41,9 +41,13 @@ class SendCapacityService
 
     def handle_state_change(pending_events, tx)
       puts tx.inspect
-      return if tx.tx_status.status == "pending" or  tx.tx_status.status == 'unknown'
-
+      return if (tx.tx_status.status == "pending") ||  (tx.tx_status.status == "unknown")
+      last_tx_hash = Rails.cache.read("last_transaction_hash")
       if tx.tx_status.status == "committed"
+        if last_tx_hash == tx.transaction.hash
+          Rails.cache.delete("last_transaction_hash")
+          Rails.cache.delete("last_transaction_time")
+        end
         pending_events.map { |pending_event| pending_event.processed! }
         pending_events.map { |pending_event| pending_event.update!(tx_status: tx.tx_status.status) }
         Account.official_account.decrement!(:balance, pending_events.inject(0) { |sum, event| sum + event.capacity })
@@ -53,6 +57,8 @@ class SendCapacityService
     end
 
     def handle_send_capacity(pending_events)
+      last_tx_time = Rails.cache.read("last_transaction_time")
+      return if last_tx_time && Time.now.to_i - last_tx_time.to_i < 200
       to_infos = pending_events.inject({}) do |memo, event|
         if memo[event.address_hash].present?
           memo[event.address_hash] = { capacity: event.capacity + memo[event.address_hash][:capacity] }
@@ -63,16 +69,18 @@ class SendCapacityService
       end
       puts to_infos
       tx_generator = ckb_wallet.advance_generate(to_infos: to_infos)
-      tx = ckb_wallet.sign(tx_generator, ENV['OFFICIAL_WALLET_PRIVATE_KEY'])
-      puts tx&.to_h.inspect      
+      tx = ckb_wallet.sign(tx_generator, ENV["OFFICIAL_WALLET_PRIVATE_KEY"])
+      puts tx&.to_h.inspect
       tx_hash = api.send_transaction(tx, "passthrough")
+      Rails.cache.write("last_transaction_hash", tx_hash, expires_in: 3.minutes)
+      Rails.cache.write("last_transaction_time", Time.now.to_i, expires_in: 3.minutes)
       pending_events.map { |pending_event| pending_event.update!(tx_hash: tx_hash, tx_status: "pending", fee: tx_fee(tx)) }
-    # rescue CKB::RPCError => e
-    #   puts e
+      # rescue CKB::RPCError => e
+      #   puts e
 
 
-    #   puts e.backtrace.join("\n")
-    #   binding.pry
+      #   puts e.backtrace.join("\n")
+      #   binding.pry
     end
 
     def tx_fee(tx)

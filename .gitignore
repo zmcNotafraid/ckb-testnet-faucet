@@ -40,3 +40,5 @@ yarn-debug.log*
 # Ignore coverage results
 coverage/*
 master.key
+.env
+.env.local
