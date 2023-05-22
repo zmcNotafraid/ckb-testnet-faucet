@@ -6,85 +6,45 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
   test "should create new claim event when address hash is valid" do
     address_hash = "ckt1qyqd5eyygtdmwdr7ge736zw6z0ju6wsw7rssu8fcve"
     assert_difference -> { ClaimEvent.count }, 1 do
-      post claim_events_url, params: { claim_event: { address_hash: address_hash } }
+      post claim_events_url, params: { claim_event: { amount: 10000, address_hash: address_hash } }
     end
-  end
-
-  test "should reject claim when claim interval is less than 3 hours" do
-    address_hash = "ckt1qyqd5eyygtdmwdr7ge736zw6z0ju6wsw7rssu8fcve"
-    create(:claim_event, address_hash: address_hash)
-    claim_event = ClaimEvent.where(address_hash: address_hash).where("created_at_unixtimestamp > ?", 3.hours.ago.to_i).pending.order(:id).first
-    next_valid_time = Time.at(claim_event.created_at_unixtimestamp + 3.hours)
-
-    post claim_events_url, params: { claim_event: { address_hash: address_hash } }
-
-    assert_response 422
-    assert_equal "Claim interval must be greater than 3 hours for the same address. Next valid time is #{next_valid_time}.", json["address_hash"].first
-  end
-
-  test "should reject claim when one IP claim count exceeds the maximum" do
-    create_list(:claim_event, 8, ip_addr: "127.0.0.1")
-    address_hash = "ckt1qyqd5eyygtdmwdr7ge736zw6z0ju6wsw7rssu8fcve"
-
-    post claim_events_url, params: { claim_event: { address_hash: address_hash } }
-
-    assert_response 422
-    assert_equal "Get up to 8 times claim per IP per day.", json["address_hash"].first
   end
 
   test "should reject claim when address hash is invalid" do
     address_hash = "ckt1q3w9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32s"
 
-    post claim_events_url, params: { claim_event: { address_hash: address_hash } }
+    post claim_events_url, params: { claim_event: { amount: 10000, address_hash: address_hash } }
 
     assert_response 422
-    assert_equal "Address is invalid.", json["address_hash"].first
+    assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"Address is invalid.", "source"=>{ "pointer"=>"/data/attributes/address_hash" } }] }
   end
 
   test "should reject claim when address hash length is less than minimum" do
     address_hash = "123"
 
-    post claim_events_url, params: { claim_event: { address_hash: address_hash } }
+    post claim_events_url, params: { claim_event: { amount: 10000, address_hash: address_hash } }
 
     assert_response 422
-    assert_equal "Address is invalid.", json["address_hash"].first
+    assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"Address is invalid.", "source"=>{ "pointer"=>"/data/attributes/address_hash" } }] }
   end
 
   test "should reject claim when address is not short payload format" do
     address_hash = "ckt1qyqlqn8vsj7r0a5rvya76tey9jd2rdnca8lqh4kcuq"
 
-    post claim_events_url, params: { claim_event: { address_hash: address_hash } }
+    post claim_events_url, params: { claim_event: { amount: 10000, address_hash: address_hash } }
 
     assert_response 422
-    assert_equal "Address cannot be multisig short payload format.", json["address_hash"].first
+    assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"Address cannot be multisig short payload format.", "source"=>{ "pointer"=>"/data/attributes/address_hash" } }] }
   end
 
   test "should reject claim when address is not testnet address" do
     address_hash = "ckb1qyqq5jr0hrm0uc8hduqp6cmjmfqmayghyfvspnxmu4"
 
-    post claim_events_url, params: { claim_event: { address_hash: address_hash } }
+    post claim_events_url, params: { claim_event: { amount: 10000, address_hash: address_hash } }
+
 
     assert_response 422
-    assert_equal "Address must be a testnet address.", json["address_hash"].first
-  end
-
-  test "should reject claim when payment amount exceeds daily limit" do
-    create(:claim_event, capacity: 4_000_000 * 10**8)
-    address_hash = "ckt1qyqd5eyygtdmwdr7ge736zw6z0ju6wsw7rssu8fcve"
-
-    post claim_events_url, params: { claim_event: { address_hash: address_hash } }
-
-    assert_response 422
-    assert_equal "Faucet payment amount exceeds the daily limit.", json["address_hash"].first
-  end
-
-  test "should reject claim when target address hash is official address" do
-    account = create(:account)
-
-    post claim_events_url, params: { claim_event: { address_hash: account.address_hash } }
-
-    assert_response 422
-    assert_equal "Does not support transfers to official address.", json["address_hash"].first
+    assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"Address must be a testnet address.", "source"=>{ "pointer"=>"/data/attributes/address_hash" } }] }
   end
 
   test "should return 15 claims when visit claim event index" do
@@ -97,7 +57,7 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response 200
     assert_equal 15, json["claimEvents"]["data"].size
-    assert_equal JSON.parse(ClaimEventSerializer.new(claim_events).serialized_json)["data"], json["claimEvents"]["data"]
+    assert_equal JSON.parse(ClaimEventSerializer.new(claim_events).serializable_hash.to_json)["data"], json["claimEvents"]["data"]
     assert_equal official_account, json["officialAccount"]
   end
 
@@ -111,6 +71,56 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response 200
     assert_equal 3, json["data"].size
-    assert_equal JSON.parse(ClaimEventSerializer.new(claim_events).serialized_json)["data"], json["data"]
+    assert_equal JSON.parse(ClaimEventSerializer.new(claim_events).serializable_hash.to_json)["data"], json["data"]
+  end
+
+  test "should reject claim when target address hash is official address" do
+    account = Account.official_account
+
+    post claim_events_url, params: { claim_event: { address_hash: account.address_hash } }
+
+    assert_response 422
+    assert_equal json, {"errors"=>[{"status"=>422, "title"=>"Unprocessable Entity", "detail"=>"Params amount is not valid.", "source"=>{"pointer"=>"/data/attributes/amount"}}]}
+  end
+
+  test "should return error when this month's remaining is zero" do
+    user = create(:account, balance: 300000 * 10**8)
+    Rails.cache.stubs(:read).with("LIMIT_#{user.address_hash}").returns(Date.today)
+
+    post claim_events_url, params: { claim_event: { amount: 100000, address_hash: user.address_hash } }
+
+    assert_response 422
+    assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"Amount is already reached maximum limit.", "source"=>{ "pointer"=>"/data/attributes/amount" } }] }
+  end
+
+  test "should return error if current claim amount added before amount greater than max limit" do
+    user = create(:account, balance: 250000 * 10**8)
+
+    post claim_events_url, params: { claim_event: { amount: 100000, address_hash: user.address_hash } }
+
+    assert_response 422
+    assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"The amount you claimed are greater than your remaining.", "source"=>{ "pointer"=>"/data/attributes/amount" } }] }
+  end
+
+  test "should create cache if claim all amount of this month" do
+    user = create(:account, balance: 200000 * 10**8)
+
+    Rails.cache.expects(:write).with("LIMIT_#{user.address_hash}", Date.today)
+    post claim_events_url, params: { claim_event: { amount: 100000, address_hash: user.address_hash } }
+
+    assert_response 200
+    assert_equal user.reload.balance, 300000 * 10 ** 8
+  end
+
+  test "should handle concurrency claim" do
+    user = create(:account, balance: 200000 * 10**8)
+      threads = 5.times.map do
+          Thread.new do
+            post claim_events_url, params: { claim_event: { amount: 100000, address_hash: user.address_hash } }
+          rescue AbstractController::DoubleRenderError
+          end
+      end
+      threads.map(&:join)
+    assert_equal user.reload.balance, 300000 * 10 ** 8
   end
 end

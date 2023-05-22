@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class ClaimEventsController < ApplicationController
+  before_action :check_claim_limit, only: :create
+  before_action :set_amount, only: :create
+  before_action :valid_claim_amount, only: :create
+  before_action :valid_claim_address_hash, only: :create
+
   def index
     account = Account.official_account
     claim_events = ClaimEvent.recent.limit(ClaimEvent::DEFAULT_CLAIM_EVENT_SIZE)
@@ -14,18 +19,36 @@ class ClaimEventsController < ApplicationController
   end
 
   def create
-    claim_event = ClaimEvent.new(claim_events_params.merge(created_at_unixtimestamp: Time.current.to_i,
-      capacity: ClaimEvent::DEFAULT_CLAIM_CAPACITY, ip_addr: request.remote_ip))
+    ClaimService.new(address_hash: claim_events_params[:address_hash], amount: @amount, remote_ip: request.remote_ip).call()
 
-    if claim_event.save
-      render json: ClaimEventSerializer.new(claim_event)
-    else
-      render json: claim_event.errors, status: :unprocessable_entity
-    end
+    render json: :ok
   end
 
   private
     def claim_events_params
-      params.require(:claim_event).permit(:address_hash)
+      params.require(:claim_event).permit(:address_hash, :amount)
+    end
+
+    def set_amount
+      @amount = claim_events_params[:amount].to_i * 10 ** 8
+    end
+
+    def check_claim_limit
+      value = Rails.cache.read("LIMIT_#{claim_events_params[:address_hash]}")
+
+      raise Errors::Invalid.new(errors: { amount: "Amount is already reached maximum limit." }) if value && value.month == Date.today.month
+    end
+
+    def valid_claim_amount
+      raise Errors::Invalid.new(errors: { amount: "Params amount is not valid." }) if ["10000", "100000", "300000"].exclude?(claim_events_params[:amount])
+    end
+
+    def valid_claim_address_hash
+      claim_event = ClaimEvent.new(address_hash: claim_events_params[:address_hash], created_at_unixtimestamp: Time.current.to_i,
+      capacity: @amount, ip_addr: request.remote_ip)
+
+      claim_event.validate!
+    rescue ActiveRecord::RecordInvalid
+      raise Errors::Invalid.new(errors: claim_event.errors.to_h)
     end
 end

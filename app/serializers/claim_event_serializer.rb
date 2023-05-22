@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class ClaimEventSerializer
-  include FastJsonapi::ObjectSerializer
+  include JSONAPI::Serializer
+
   set_key_transform :camel_lower
 
   attributes :address_hash, :status, :tx_hash, :tx_status, :id
