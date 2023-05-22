@@ -24,10 +24,16 @@ declare namespace State {
     balance: string;
   }
 
+  export interface userAccount {
+    addressHash: string;
+    remaining: string | null;
+  }
+
   export interface WelcomeProps {
     claimEvents: Response;
     addressHash: string;
     officialAccount: Account;
+    userAccount: userAccount;
     aggronExplorerHost: string;
   }
 

@@ -25,6 +25,8 @@ class ClaimService
       claim_event.save!
 
       Rails.cache.write("LIMIT_#{address_hash}", Date.today) if account.balance == Account::MAX_CAPACITY_PER_MONTH
+
+      claim_event
     rescue ActiveRecord::RecordInvalid
       raise Errors::Invalid.new(errors: claim_event.errors.to_h)
     end

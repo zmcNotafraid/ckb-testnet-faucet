@@ -1,13 +1,13 @@
 import React from "react";
-import { Button, InputGroup, FormControl, Form, Col, Row } from "react-bootstrap";
+import { Button, FormControl, Form, Col, Row, Alert } from "react-bootstrap";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
 import Tooltip from 'react-bootstrap/Tooltip';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 
 interface ClaimEventFormProps {
-  addressHash: string;
-  amount: string;
+  addressHash: string,
+  remaining: string | null;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
   handleInput: React.ChangeEventHandler<HTMLInputElement>;
   handleSubmit: React.FormEventHandler<HTMLFormElement>;
@@ -16,15 +16,25 @@ interface ClaimEventFormProps {
 
 const ClaimEventForm: React.FC<ClaimEventFormProps> = ({
   addressHash,
-  amount,
+  remaining,
   handleChange,
   handleInput,
   handleSubmit,
   formError
 }) => {
-  const defaultFormError = "please enter your address";
   return (
     <Form noValidate onSubmit={handleSubmit}>
+      <Form.Group as={Row} className="mb-3">
+        <Col sm={{ span: 10, offset: 1 }}>
+          {
+            formError &&
+            <Alert key="danger" variant="danger">
+              {formError}
+            </Alert>
+          }
+        </Col>
+      </Form.Group>
+
       <Form.Group as={Row} className="mb-3" controlId="formHorizontalEmail">
         <Form.Label column sm={{ span: 2, offset: 1 }}>
           To Address
@@ -47,7 +57,7 @@ const ClaimEventForm: React.FC<ClaimEventFormProps> = ({
         <Form.Label column sm={{ span: 2, offset: 1 }}>
           Amount
         </Form.Label>
-        <Col sm="4">
+        <Col sm="4" className="align-self-center">
           <Form.Check
             inline
             label="10,000"
@@ -76,23 +86,22 @@ const ClaimEventForm: React.FC<ClaimEventFormProps> = ({
             id={`three_hundred_thousand_radio`}
           />
         </Col>
-        <Col sm="4" >
+
+        <Col sm="4" className="align-self-center" >
           <div id="remaining-text"> Remaining: {" "}
-            {Number(1000).toLocaleString("en")}
+            {remaining != null && Number(remaining).toLocaleString("en")}
             &nbsp; CKB &nbsp;
             <OverlayTrigger
               overlay={
                 <Tooltip id="remaining-tooltip">
-                  Your claimable amount now for this month is 280,000 CKB.
+                  Your claimable amount now for this month is {remaining != null && Number(remaining).toLocaleString("en")} CKB.
                 </Tooltip>
               }
             >
               <FontAwesomeIcon icon={faCircleQuestion} />
             </OverlayTrigger>
           </div>
-
         </Col>
-
       </Form.Group>
 
       <Form.Group as={Row} className="mb-3">
@@ -100,7 +109,7 @@ const ClaimEventForm: React.FC<ClaimEventFormProps> = ({
           <Button variant="primary" type="submit" id="claim_button">Claim</Button>
         </Col>
       </Form.Group>
-    </Form>
+    </Form >
   );
 };
 

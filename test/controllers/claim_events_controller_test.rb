@@ -59,6 +59,7 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 15, json["claimEvents"]["data"].size
     assert_equal JSON.parse(ClaimEventSerializer.new(claim_events).serializable_hash.to_json)["data"], json["claimEvents"]["data"]
     assert_equal official_account, json["officialAccount"]
+    assert_nil json["userAccount"]["remaining"]
   end
 
   test "should return pending claim events by given address hash" do
@@ -122,5 +123,14 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
       end
       threads.map(&:join)
     assert_equal user.reload.balance, 300000 * 10 ** 8
+  end
+
+  test "should return user's remaining" do
+    user = create(:account, balance: 100000 * 10 ** 8)
+
+    get claim_events_url, params: {address_hash: user.address_hash}
+
+    assert_response 200
+    assert_equal 200000, json["userAccount"]["remaining"]
   end
 end

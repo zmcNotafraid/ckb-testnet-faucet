@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import ClaimEventForm from "./ClaimEventForm";
 import ClaimEventList from "./ClaimEventList";
 import axios from "axios";
@@ -10,6 +10,7 @@ import useSWR from "swr";
 const Welcome: React.FC<WelcomeProps> = ({
   claimEvents,
   officialAccount,
+  userAccount,
   aggronExplorerHost
 }) => {
   const addressHash = useRef("");
@@ -26,6 +27,10 @@ const Welcome: React.FC<WelcomeProps> = ({
       addressHash: officialAccount.addressHash,
       balance: officialAccount.balance
     },
+    userAccount: {
+      addressHash: userAccount.addressHash,
+      remaining: userAccount.remaining
+    },
     onQuery: false
   });
 
@@ -34,18 +39,32 @@ const Welcome: React.FC<WelcomeProps> = ({
   const fetchClaimEvents = (url: string) => {
     axios({
       method: "GET",
-      url: url
+      url: url,
+      params: { address_hash: addressHash.current }
     })
       .then(response => {
-        setState({
-          ...state,
-          officialAccount: response.data.officialAccount,
-          claimEvents: response.data.claimEvents.data.map(
-            (event: ResponseData) => {
-              return event.attributes;
-            }
-          )
-        });
+        if (addressHash.current != "") {
+          setState({
+            ...state,
+            officialAccount: response.data.officialAccount,
+            claimEvents: response.data.claimEvents.data.map(
+              (event: ResponseData) => {
+                return event.attributes;
+              }
+            ),
+            userAccount: response.data.userAccount
+          })
+        } else {
+          setState({
+            ...state,
+            officialAccount: response.data.officialAccount,
+            claimEvents: response.data.claimEvents.data.map(
+              (event: ResponseData) => {
+                return event.attributes;
+              }
+            )
+          });
+        }
       })
       .catch(error => { });
   };
@@ -70,7 +89,6 @@ const Welcome: React.FC<WelcomeProps> = ({
 
     event.preventDefault();
   };
-
 
   const handleInput: React.ChangeEventHandler<HTMLInputElement> = (
     event: React.FormEvent<HTMLInputElement>
@@ -124,10 +142,9 @@ const Welcome: React.FC<WelcomeProps> = ({
         addNewEvent(response.data.data.attributes);
       })
       .catch(error => {
-        debugger
         setState({
           ...state,
-          formError: error.response.data["address_hash"][0]
+          formError: error.response.data.errors[0]["detail"]
         });
       });
 
@@ -223,6 +240,7 @@ const Welcome: React.FC<WelcomeProps> = ({
                 handleInput={handleInput}
                 handleSubmit={handleSubmit}
                 formError={state.formError}
+                remaining={state.userAccount.remaining}
               ></ClaimEventForm>
             </Col>
           </Row>
