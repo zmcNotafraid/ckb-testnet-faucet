@@ -22,29 +22,9 @@ It supports claim ckb testnet tokens.
 
 ```shell
 $ cd ckb-testnet-faucet/
-$ EDITOR=vim rails credentials:edit (overwrite configs)
+$ copy .env.example file to .env
 $ bin/setup
 $ bundle exec rake migration:create_official_account
-```
-
-### credential file example:
-
-```yml
-REDIS:
-  URL: redis://172.31.16.215:7379/11
-DB:
-  USERNAME: "your db username"
-  PASSWORD: "your db password"
-  HOST: localhost
-  PORT: 5432
-  RAILS_MAX_THREADS: 30
-CKB_NODE_URL: "http://localhost"
-OFFICIAL_WALLET_PRIVATE_KEY: "your private key"
-SECP_CELL_TYPE_HASH: "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8"
-ALLOWED_IPS:
-  - 127.0.0.1
-TESTNET_EXPLORER_HOST: "https://pudge.explorer.nervos.org/"
-secret_key_base: "your secret key base"
 ```
 
 ## Running Test

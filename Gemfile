@@ -31,14 +31,16 @@ gem "jbuilder", "~> 2.7"
 gem "bootsnap", ">= 1.4.2", require: false
 
 # CKB SDK
-gem "ckb-sdk-ruby", git: "https://github.com/nervosnetwork/ckb-sdk-ruby.git", require: "ckb", branch: "develop"
+gem "ckb-sdk-ruby", github: "ShiningRay/ckb-sdk-ruby", require: "ckb", branch: "move_to_-rbsecp256k1"
 
 # Redis
 gem "hiredis", "~> 0.6.1"
 gem "redis", "~> 4.0", ">= 4.0.3"
 gem "rack-attack"
 
-gem "fast_jsonapi"
+gem "jsonapi-serializer"
+
+gem "dotenv-rails"
 
 group :development, :test do
   gem "pry"
@@ -72,7 +74,7 @@ group :test do
   gem "database_cleaner"
   gem "mocha"
   gem "factory_bot_rails"
-  gem "faker", git: "https://github.com/stympy/faker.git", branch: "master"
+  gem "faker"
   gem "codecov", require: false
 end
 

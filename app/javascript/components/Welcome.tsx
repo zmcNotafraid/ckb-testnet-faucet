@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import ClaimEventForm from "./ClaimEventForm";
 import ClaimEventList from "./ClaimEventList";
 import axios from "axios";
@@ -10,9 +10,11 @@ import useSWR from "swr";
 const Welcome: React.FC<WelcomeProps> = ({
   claimEvents,
   officialAccount,
+  userAccount,
   aggronExplorerHost
 }) => {
   const addressHash = useRef("");
+  const amount = useRef("");
   const targetAddress = useRef("");
   const tempClaimEvents = useRef<Array<ClaimEventPresenter>>([]);
   const claimEventPresenters = claimEvents.data.map(event => {
@@ -25,6 +27,10 @@ const Welcome: React.FC<WelcomeProps> = ({
       addressHash: officialAccount.addressHash,
       balance: officialAccount.balance
     },
+    userAccount: {
+      addressHash: userAccount.addressHash,
+      remaining: userAccount.remaining
+    },
     onQuery: false
   });
 
@@ -33,18 +39,32 @@ const Welcome: React.FC<WelcomeProps> = ({
   const fetchClaimEvents = (url: string) => {
     axios({
       method: "GET",
-      url: url
+      url: url,
+      params: { address_hash: addressHash.current }
     })
       .then(response => {
-        setState({
-          ...state,
-          officialAccount: response.data.officialAccount,
-          claimEvents: response.data.claimEvents.data.map(
-            (event: ResponseData) => {
-              return event.attributes;
-            }
-          )
-        });
+        if (addressHash.current != "") {
+          setState({
+            ...state,
+            officialAccount: response.data.officialAccount,
+            claimEvents: response.data.claimEvents.data.map(
+              (event: ResponseData) => {
+                return event.attributes;
+              }
+            ),
+            userAccount: response.data.userAccount
+          })
+        } else {
+          setState({
+            ...state,
+            officialAccount: response.data.officialAccount,
+            claimEvents: response.data.claimEvents.data.map(
+              (event: ResponseData) => {
+                return event.attributes;
+              }
+            )
+          });
+        }
       })
       .catch(error => { });
   };
@@ -59,6 +79,15 @@ const Welcome: React.FC<WelcomeProps> = ({
       ...state,
       claimEvents: claimEvents
     });
+  };
+
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (
+    event: React.FormEvent<HTMLInputElement>
+  ) => {
+    const target = event.target as HTMLInputElement;
+    amount.current = target.value;
+
+    event.preventDefault();
   };
 
   const handleInput: React.ChangeEventHandler<HTMLInputElement> = (
@@ -89,6 +118,7 @@ const Welcome: React.FC<WelcomeProps> = ({
   ) => {
     const form = event.currentTarget;
     const addressInput = form.elements[0] as HTMLInputElement;
+
     if (addressInput.value === "" && addressInput.value.trim().length < 40) {
       setState({ ...state, formError: "Address is invalid." });
       event.preventDefault();
@@ -103,7 +133,7 @@ const Welcome: React.FC<WelcomeProps> = ({
     axios({
       method: "POST",
       url: "/claim_events",
-      data: { claim_event: { address_hash: addressHash.current } },
+      data: { claim_event: { address_hash: addressHash.current, amount: amount.current } },
       headers: {
         "X-CSRF-Token": csrfToken
       }
@@ -114,7 +144,7 @@ const Welcome: React.FC<WelcomeProps> = ({
       .catch(error => {
         setState({
           ...state,
-          formError: error.response.data["address_hash"][0]
+          formError: error.response.data.errors[0]["detail"]
         });
       });
 
@@ -193,7 +223,7 @@ const Welcome: React.FC<WelcomeProps> = ({
               xl="5"
               className="justify-content-center content-container"
             >
-              <p>Claim testnet 10000 CKB from the faucet once every 24 hours</p>
+              <p>Every address can claim a fixed amount of 300,000 CKB in a month. The claimable amount will update on the 1st of every month.</p>
             </Col>
           </Row>
           <Row className="justify-content-center align-items-center">
@@ -206,9 +236,11 @@ const Welcome: React.FC<WelcomeProps> = ({
             >
               <ClaimEventForm
                 addressHash={addressHash.current}
+                handleChange={handleChange}
                 handleInput={handleInput}
                 handleSubmit={handleSubmit}
                 formError={state.formError}
+                remaining={state.userAccount.remaining}
               ></ClaimEventForm>
             </Col>
           </Row>

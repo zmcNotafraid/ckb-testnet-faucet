@@ -7,7 +7,7 @@ FactoryBot.define do
 
       CKB::Address.new(script, mode: CKB::MODE::TESTNET).generate
     end
-    capacity { ClaimEvent::DEFAULT_CLAIM_CAPACITY }
+    capacity { 10000 }
     fee { 0.00000548 }
     ip_addr { Faker::Internet.ip_v4_cidr }
     created_at_unixtimestamp { Time.current.to_i }
