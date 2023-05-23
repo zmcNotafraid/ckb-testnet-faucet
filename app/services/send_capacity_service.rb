@@ -28,7 +28,7 @@ class SendCapacityService
 
   private
     def ckb_wallet
-      @ckb_wallet ||= CKB::Wallets::NewWallet.new(api: api, indexer_api: indexer_api, from_addresses: Account.last.address_hash)
+      @ckb_wallet ||= CKB::Wallets::NewWallet.new(api: api, indexer_api: indexer_api, from_addresses: Account.first.address_hash)
     end
 
     def api
