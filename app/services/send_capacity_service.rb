@@ -41,7 +41,7 @@ class SendCapacityService
 
     def handle_state_change(pending_events, tx)
       puts tx.inspect
-      return if (tx.tx_status.status == "pending") ||  (tx.tx_status.status == "unknown")
+      return if tx.tx_status.status == "pending"
       last_tx_hash = Rails.cache.read("last_transaction_hash")
       if tx.tx_status.status == "committed"
         if last_tx_hash == tx.transaction.hash
@@ -52,6 +52,7 @@ class SendCapacityService
         pending_events.map { |pending_event| pending_event.update!(tx_status: tx.tx_status.status) }
         Account.official_account.decrement!(:balance, pending_events.inject(0) { |sum, event| sum + event.capacity })
       else
+        pending_events.map { |pending_event| pending_event.rejected! } if ["rejected", "unknown"].include?(tx.tx_status.status)
         pending_events.map { |pending_event| pending_event.update!(tx_status: tx.tx_status.status) }
       end
     end
