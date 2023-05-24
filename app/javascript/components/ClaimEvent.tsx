@@ -77,7 +77,7 @@ const ClaimEvent: React.FC<ClaimEventProps> = ({ claimEvent }) => {
           <Row>
             <Col>
               <Badge
-                variant={claimEvent.status == "pending" ? "warning" : "success"}
+                variant={claimEvent.status == "pending" ? "warning" : (claimEvent.status == "processed" ? "success" : "danger")}
                 className="event-status"
               >
                 {claimEvent.status}
