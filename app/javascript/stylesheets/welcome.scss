@@ -114,11 +114,11 @@ div.empty-records-container,
   color: white
 }
 
-#remaining-text {
-  color: white;
-  text-align: right;
-}
 
 #claim_button {
   background: #9A2CEC;
+}
+
+input[type="radio"] {
+  accent-color: #9A2CEC;
 }

@@ -23,18 +23,7 @@ const ClaimEventForm: React.FC<ClaimEventFormProps> = ({
   formError
 }) => {
   return (
-    <Form noValidate onSubmit={handleSubmit}>
-      <Form.Group as={Row} className="mb-3">
-        <Col sm={{ span: 10, offset: 1 }}>
-          {
-            formError &&
-            <Alert key="danger" variant="danger">
-              {formError}
-            </Alert>
-          }
-        </Col>
-      </Form.Group>
-
+    <Form onSubmit={handleSubmit}>
       <Form.Group as={Row} className="mb-3" controlId="formHorizontalEmail">
         <Form.Label column sm={{ span: 2, offset: 1 }}>
           To Address
@@ -47,23 +36,29 @@ const ClaimEventForm: React.FC<ClaimEventFormProps> = ({
             name="address_hash"
             value={addressHash}
             onChange={handleInput}
-            className={formError !== "" ? "is-invalid" : ""}
             autoFocus
           />
+          {formError &&
+            <Form.Control.Feedback className="d-block" type="invalid">
+              {formError}
+            </Form.Control.Feedback>
+          }
         </Col>
+
       </Form.Group>
 
       <Form.Group as={Row} className="mb-3">
         <Form.Label column sm={{ span: 2, offset: 1 }}>
           Amount
         </Form.Label>
-        <Col sm="4" className="align-self-center">
+        <Col className="align-self-center flex-grow-1" style={{ maxWidth: 300 }}>
           <Form.Check
             inline
             label="10,000"
             name="amount"
             type="radio"
             value="10000"
+            defaultChecked
             onChange={handleChange}
             id={`ten_thousand_radio`}
           />
@@ -87,20 +82,19 @@ const ClaimEventForm: React.FC<ClaimEventFormProps> = ({
           />
         </Col>
 
-        <Col sm="4" className="align-self-center" >
-          <div id="remaining-text"> Remaining: {" "}
-            {remaining != null && Number(remaining).toLocaleString("en")}
-            &nbsp; CKB &nbsp;
-            <OverlayTrigger
-              overlay={
-                <Tooltip id="remaining-tooltip">
-                  Your claimable amount now for this month is {remaining != null && Number(remaining).toLocaleString("en")} CKB.
-                </Tooltip>
-              }
-            >
-              <FontAwesomeIcon icon={faCircleQuestion} />
-            </OverlayTrigger>
-          </div>
+        <Col className="align-self-center flex-grow-0 text-light" style={{ minWidth: 180, color: 'white' }}>
+          Remaining: {" "}
+          {remaining != null && Number(remaining).toLocaleString("en")}
+          &nbsp; CKB &nbsp;
+          <OverlayTrigger
+            overlay={
+              <Tooltip id="remaining-tooltip">
+                Your claimable amount now for this month is {remaining != null && Number(remaining).toLocaleString("en")} CKB.
+              </Tooltip>
+            }
+          >
+            <FontAwesomeIcon icon={faCircleQuestion} />
+          </OverlayTrigger>
         </Col>
       </Form.Group>
 
