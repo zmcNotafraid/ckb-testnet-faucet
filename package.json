@@ -33,7 +33,7 @@
     "swr": "^0.5.5",
     "ts-loader": "^6.2.1",
     "turbolinks": "^5.2.0",
-    "typescript": "^3.7.5",
+    "typescript": "4.0.5",
     "y18n": "4.0.1",
     "yargs-parser": "^5.0.0-security.0"
   },
