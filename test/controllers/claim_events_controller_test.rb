@@ -133,4 +133,24 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
     assert_response 200
     assert_equal 200000, json["userAccount"]["remaining"]
   end
+
+  test "should claim all amount if last month not claim maxium capacity" do
+    user = create(:account, balance: 200000 * 10**8, updated_at: Date.today.last_month.beginning_of_day)
+
+    Rails.cache.expects(:write).with("LIMIT_#{user.address_hash}", Date.today)
+    post claim_events_url, params: { claim_event: { amount: 300000, address_hash: user.address_hash } }
+
+    assert_response 200
+    assert_equal user.reload.balance, 300000 * 10 ** 8
+  end
+
+  test "should delete cache when next month" do
+    user = create(:account, balance: 300000 * 10**8, updated_at: Date.today.last_month.beginning_of_day)
+
+    Rails.cache.expects(:delete).with("LIMIT_#{user.address_hash}")
+    post claim_events_url, params: { claim_event: { amount: 100000, address_hash: user.address_hash } }
+
+    assert_response 200
+    assert_equal user.reload.balance, 100000 * 10 ** 8
+  end
 end
