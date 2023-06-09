@@ -22,7 +22,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       "https://aggron.explorer.nervos.org",
       "https://pudge.explorer.nervos.org",
       "https://faucet.nervos.org",
-      /\Ahttps:\/\/ckb-explorer-.*-magickbase.vercel.app\z/,
+      /\Ahttps:\/\/ckb-.*\.vercel\.app/,
       "http://localhost:3000",
       (ENV["STAGING_DOMAIN"]).to_s
     resource "*", headers: :any, methods: [:get, :post, :head, :options]
