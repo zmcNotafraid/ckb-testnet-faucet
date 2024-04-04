@@ -103,6 +103,17 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
     assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"The amount you claimed are greater than your remaining.", "source"=>{ "pointer"=>"/data/attributes/amount" } }] }
   end
 
+  test "should return error if current ip was limited" do
+    user = create(:account, balance: 550000 * 10**8)
+    create(:claim_event, capacity: 550000 * 10 ** 8, ip_addr: IPAddr.new("127.0.0.1"), address_hash: user.address_hash, created_at_unixtimestamp: 1.hours.ago.to_i)
+
+    post claim_events_url, params: { claim_event: { amount: 100000, address_hash: user.address_hash } }, env: { "REMOTE_ADDR": "127.0.0.1" }
+
+    assert_response 422
+    assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"This IP has been restricted and cannot be used in the last 24 hours.", "source"=>{ "pointer"=>"/data/attributes/amount" } }] }
+  end
+
+
   test "should create cache if claim all amount of this month" do
     user = create(:account, balance: 200000 * 10**8)
 
