@@ -2,7 +2,7 @@
 
 require_relative "../config/environment"
 
-BalanceUpdater = Concurrent::TimerTask.new(execution_interval: rand(2.hours..4.hours)) do
+BalanceUpdater = Concurrent::TimerTask.new(execution_interval: 3.minute) do
   puts 'Update balance'
   ActiveRecord::Base.connection_pool.with_connection do
     UpdateOfficialAccountBalanceService.call
