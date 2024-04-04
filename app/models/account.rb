@@ -5,6 +5,7 @@ class Account < ApplicationRecord
   validates :balance, numericality: { greater_than_or_equal_to: 0 }
 
   MAX_CAPACITY_PER_MONTH = 300_000 * 10 ** 8
+  MAX_CAPACITY_IP_PER_DAY = 600_000 * 10 ** 8
 
   def self.official_account
     first

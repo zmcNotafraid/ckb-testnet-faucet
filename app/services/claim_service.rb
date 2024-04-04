@@ -13,8 +13,10 @@ class ClaimService
     ApplicationRecord.transaction do
       init_account!
 
-      account = Account.lock.find_by(address_hash: address_hash)
+      capacity_amount = ClaimEvent.h24.where(ip_addr: remote_ip).sum(:capacity)
+      raise Errors::Invalid.new(errors: { amount: "This IP has been restricted and cannot be used in the last 24 hours." }) if capacity_amount + amount > Account::MAX_CAPACITY_IP_PER_DAY
 
+      account = Account.lock.find_by(address_hash: address_hash)
       raise Errors::Invalid.new(errors: { amount: "The amount you claimed are greater than your remaining." }) if account.balance + amount > Account::MAX_CAPACITY_PER_MONTH
 
       account.balance += amount
