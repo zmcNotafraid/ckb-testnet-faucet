@@ -9,7 +9,7 @@ class ClaimEventsController < ApplicationController
   def index
     account = Account.official_account
     claim_events = ClaimEvent.recent.limit(ClaimEvent::DEFAULT_CLAIM_EVENT_SIZE)
-    remaining = 
+    remaining =
       if params[:address_hash].present?
         user = Account.find_by(address_hash: params[:address_hash])
         (Account::MAX_CAPACITY_PER_MONTH - (user&.balance || 0))/(10 **8)
@@ -24,6 +24,7 @@ class ClaimEventsController < ApplicationController
   end
 
   def create
+    Rails.logger.info("=======================Request ENV: #{request.env.inspect}")
     claim_event = ClaimService.new(address_hash: claim_events_params[:address_hash], amount: @amount, remote_ip: request.remote_ip).call()
 
     render json: ClaimEventSerializer.new(claim_event)
