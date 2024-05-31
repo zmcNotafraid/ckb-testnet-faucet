@@ -24,8 +24,7 @@ class ClaimEventsController < ApplicationController
   end
 
   def create
-    Rails.logger.info("=======================Request ENV: #{request.env.inspect}")
-    claim_event = ClaimService.new(address_hash: claim_events_params[:address_hash], amount: @amount, remote_ip: request.remote_ip).call()
+    claim_event = ClaimService.new(address_hash: claim_events_params[:address_hash], amount: @amount, remote_ip: request.env["HTTP_CF_CONNECTING_IP"]).call()
 
     render json: ClaimEventSerializer.new(claim_event)
   end
