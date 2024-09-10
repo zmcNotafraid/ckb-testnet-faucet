@@ -18,10 +18,9 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins "https://explorer.nervos.org",
-      "https://explorer-testnet.nervos.org",
-      "https://aggron.explorer.nervos.org",
       "https://pudge.explorer.nervos.org",
       "https://faucet.nervos.org",
+      "https://preview-faucet.magickbase.com",
       /\Ahttps:\/\/ckb-.*\.vercel\.app/,
       "http://localhost:3000",
       (ENV["STAGING_DOMAIN"]).to_s
