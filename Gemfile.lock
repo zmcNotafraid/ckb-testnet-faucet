@@ -1,7 +1,7 @@
 GIT
-  remote: https://github.com/nervosnetwork/ckb-sdk-ruby.git
-  revision: 1790c72fb886bda3e30936a73bc3d1cbcee6c91f
-  branch: develop
+  remote: https://github.com/zmcNotafraid/ckb-sdk-ruby.git
+  revision: 4eef39d9f7952f5c02c1723d6fb6964059dabf0c
+  branch: custom-collector-order
   specs:
     ckb-sdk-ruby (0.103.0)
       net-http-persistent (~> 4.0.1)
@@ -156,7 +156,7 @@ GEM
     mocha (2.0.2)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.7.0)
-    net-http-persistent (4.0.2)
+    net-http-persistent (4.0.4)
       connection_pool (~> 2.2)
     net-imap (0.3.4)
       date

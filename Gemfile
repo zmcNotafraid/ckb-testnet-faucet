@@ -31,7 +31,7 @@ gem "jbuilder", "~> 2.7"
 gem "bootsnap", ">= 1.4.2", require: false
 
 # CKB SDK
-gem "ckb-sdk-ruby", git: "https://github.com/nervosnetwork/ckb-sdk-ruby.git", require: "ckb", branch: "develop"
+gem "ckb-sdk-ruby", git: "https://github.com/zmcNotafraid/ckb-sdk-ruby.git", require: "ckb", branch: "custom-collector-order"
 
 # Redis
 gem "hiredis", "~> 0.6.1"

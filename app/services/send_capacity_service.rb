@@ -69,7 +69,7 @@ class SendCapacityService
         memo
       end
       puts to_infos
-      tx_generator = ckb_wallet.advance_generate(to_infos: to_infos)
+      tx_generator = ckb_wallet.advance_generate(to_infos: to_infos, order: "desc")
       tx = ckb_wallet.sign(tx_generator, ENV["OFFICIAL_WALLET_PRIVATE_KEY"])
       puts tx&.to_h.inspect
       tx_hash = api.send_transaction(tx, "passthrough")
