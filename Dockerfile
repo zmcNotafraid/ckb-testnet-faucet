@@ -1,10 +1,12 @@
 ARG RUBY_VERSION=2.7.5
-FROM ruby:$RUBY_VERSION as builder
+FROM ruby:$RUBY_VERSION AS builder
 LABEL MAINTAINER Nervos Network
 LABEL org.opencontainers.image.source https://github.com/Magickbase/ckb-testnet-faucet
 # RUN sed --in-place --regexp-extended "s/(\/\/)(deb|security).debian.org/\1mirrors.ustc.edu.cn/" /etc/apt/sources.list && \
 RUN apt-get update
 # && apt-get upgrade --yes
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
+
 RUN apt-get install -y  build-essential \
   default-libmysqlclient-dev \
   git \
@@ -31,6 +33,7 @@ ENV RAILS_SERVE_STATIC_FILES true
 ENV RAILS_LOG_TO_STDOUT true
 
 COPY package.json yarn.lock Rakefile /usr/src/
+RUN yarn config set strict-ssl false
 RUN yarn install
 # COPY Gemfile* package.json yarn.lock .yarnrc ./
 COPY Gemfile* ./
