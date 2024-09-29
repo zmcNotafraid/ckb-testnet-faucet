@@ -35,12 +35,12 @@ class ClaimService
   end
 
   private
-  def init_account!
-    account = Account.create_or_find_by!(address_hash: address_hash)
-    value = Rails.cache.read("LIMIT_#{address_hash}")
-    if (value && value.month != Date.today.month) || account.updated_at.month != Date.today.month
-      account.update!(balance: 0)
-      Rails.cache.delete("LIMIT_#{address_hash}")
+    def init_account!
+      account = Account.create_or_find_by!(address_hash: address_hash)
+      value = Rails.cache.read("LIMIT_#{address_hash}")
+      if (value && value.month != Date.today.month) || account.updated_at.month != Date.today.month
+        account.update!(balance: 0)
+        Rails.cache.delete("LIMIT_#{address_hash}")
+      end
     end
-  end
 end

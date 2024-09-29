@@ -2,8 +2,8 @@
 
 require_relative "../config/environment"
 
-BalanceUpdater = Concurrent::TimerTask.new(execution_interval: 3.minute) do
-  puts 'Update balance'
+BalanceUpdater = Concurrent::TimerTask.new(execution_interval: 3.hour) do
+  puts 'Sync Offical Account Balance'
   ActiveRecord::Base.connection_pool.with_connection do
     UpdateOfficialAccountBalanceService.call
   end
@@ -11,7 +11,11 @@ end
 BalanceUpdater.execute
 
 loop do
-  puts 'Sending capacity'
-  SendCapacityService.new.call
+  puts "Check Offical Account Balance Enough"
+  enough? = BalanceEnoughCheckerService.call
+  if enough?
+    puts 'Sending capacity'
+    SendCapacityService.new.call
+  end
   sleep(10)
 end
