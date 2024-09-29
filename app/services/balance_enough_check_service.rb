@@ -14,7 +14,7 @@ class BalanceEnoughCheckService
       offical_account = CKB::Wallet.from_hex(api,  ENV["OFFICIAL_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
       transfer_amount = less_amount + DEFAULT_TRANSFER_CAPACITY_AMOUNT
       tx_hash = inner_account.send_capacity(offical_account.address, transfer_amount, fee: 1000)
-      InnerTransfer.create!(tx_hash:, amount: transfer_amount)
+      InnerTransfer.create!(tx_hash: tx_hash, amount: transfer_amount)
       false
     else
       true
