@@ -74,7 +74,7 @@ class SendCapacityService
       Rails.cache.write("last_transaction_hash", tx_hash, expires_in: 3.minutes)
       Rails.cache.write("last_transaction_time", Time.now.to_i, expires_in: 3.minutes)
       pending_events.map { |pending_event| pending_event.update!(tx_hash: tx_hash, tx_status: "pending", fee: tx_fee(tx)) }
-      Account.offical_account.decrement!(:balance, total_send_capacity)
+      Account.official_account.decrement!(:balance, total_send_capacity)
       # rescue CKB::RPCError => e
       #   puts e
 

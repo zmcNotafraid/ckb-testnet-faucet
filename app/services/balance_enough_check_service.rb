@@ -11,9 +11,9 @@ class BalanceEnoughCheckService
     if InnerTransfer.tx_pending.exists? || total_send_capacity > official_account_balance
       less_amount = total_send_capacity - official_account_balance  
       inner_account = CKB::Wallet.from_hex(api, ENV["INNER_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
-      offical_account = CKB::Wallet.from_hex(api,  ENV["OFFICIAL_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
+      official_account = CKB::Wallet.from_hex(api,  ENV["OFFICIAL_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
       transfer_amount = less_amount + DEFAULT_TRANSFER_CAPACITY_AMOUNT
-      tx_hash = inner_account.send_capacity(offical_account.address, transfer_amount, fee: 1000)
+      tx_hash = inner_account.send_capacity(official_account.address, transfer_amount, fee: 1000)
       InnerTransfer.create!(tx_hash: tx_hash, amount: transfer_amount)
       false
     else
@@ -27,7 +27,7 @@ class BalanceEnoughCheckService
       tx = api.get_transaction(transfer.tx_hash)
       if tx.tx_status.status == "committed"
         ApplicationRecord.transaction do
-          Account.offical_account.increment!(:balance, transfer.amount)
+          Account.official_account.increment!(:balance, transfer.amount)
           transfer.update!(tx_status: tx.tx_status.status)
         end
       elsif tx.tx_status.status == "rejected"
