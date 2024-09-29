@@ -8,7 +8,7 @@ class BalanceEnoughCheckService
 
     total_send_capacity = ClaimEvent.pending.sum(:capacity)
     official_account_balance = Account.official_account.balance
-    if InnerTransfer.pending.exists? || total_send_capacity > official_account_balance
+    if InnerTransfer.tx_pending.exists? || total_send_capacity > official_account_balance
       less_amount = total_send_capacity - official_account_balance  
       inner_account = CKB::Wallet.from_hex(api, ENV["INNER_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
       offical_account = CKB::Wallet.from_hex(api,  ENV["OFFICIAL_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
@@ -23,7 +23,7 @@ class BalanceEnoughCheckService
 
   private
   def sync_transfer_tx_status
-    InnerTransfer.pending.each do |transfer|
+    InnerTransfer.tx_pending.each do |transfer|
       tx = api.get_transaction(transfer.tx_hash)
       if tx.tx_status.status == "committed"
         ApplicationRecord.transaction do
