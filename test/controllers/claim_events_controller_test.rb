@@ -81,7 +81,7 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
     post claim_events_url, params: { claim_event: { address_hash: account.address_hash } }
 
     assert_response 422
-    assert_equal json, {"errors"=>[{"status"=>422, "title"=>"Unprocessable Entity", "detail"=>"Params amount is not valid.", "source"=>{"pointer"=>"/data/attributes/amount"}}]}
+    assert_equal json, { "errors"=>[{ "status"=>422, "title"=>"Unprocessable Entity", "detail"=>"Params amount is not valid.", "source"=>{ "pointer"=>"/data/attributes/amount" } }] }
   end
 
   test "should return error when this month's remaining is zero" do
@@ -126,20 +126,20 @@ class ClaimEventsControllerTest < ActionDispatch::IntegrationTest
 
   test "should handle concurrency claim" do
     user = create(:account, balance: 200000 * 10**8)
-      threads = 5.times.map do
-          Thread.new do
-            post claim_events_url, params: { claim_event: { amount: 100000, address_hash: user.address_hash } }
-          rescue AbstractController::DoubleRenderError
-          end
-      end
-      threads.map(&:join)
+    threads = 5.times.map do
+      Thread.new do
+          post claim_events_url, params: { claim_event: { amount: 100000, address_hash: user.address_hash } }
+        rescue AbstractController::DoubleRenderError
+        end
+    end
+    threads.map(&:join)
     assert_equal user.reload.balance, 300000 * 10 ** 8
   end
 
   test "should return user's remaining" do
     user = create(:account, balance: 100000 * 10 ** 8)
 
-    get claim_events_url, params: {address_hash: user.address_hash}
+    get claim_events_url, params: { address_hash: user.address_hash }
 
     assert_response 200
     assert_equal 200000, json["userAccount"]["remaining"]

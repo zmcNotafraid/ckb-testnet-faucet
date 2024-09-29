@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_05_22_012458) do
+ActiveRecord::Schema.define(version: 2024_09_29_065129) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,6 +33,14 @@ ActiveRecord::Schema.define(version: 2023_05_22_012458) do
     t.decimal "fee", precision: 20
     t.string "tx_hash"
     t.integer "tx_status", limit: 2, default: 0
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "inner_transfers", force: :cascade do |t|
+    t.binary "tx_hash"
+    t.bigint "amount"
+    t.integer "tx_status", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
