@@ -12,7 +12,7 @@ BalanceUpdater.execute
 
 loop do
   puts "Check Offical Account Balance Enough"
-  enough? = BalanceEnoughCheckerService.new.call
+  enough? = BalanceEnoughCheckService.new.call
   if enough?
     puts 'Sending capacity'
     SendCapacityService.new.call
