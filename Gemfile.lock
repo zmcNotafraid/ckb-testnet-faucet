@@ -1,7 +1,7 @@
 GIT
-  remote: https://github.com/nervosnetwork/ckb-sdk-ruby.git
-  revision: 4b43de58fb69cc046b3cef234d70fd9657711ff6
-  branch: develop
+  remote: https://github.com/zmcNotafraid/ckb-sdk-ruby
+  revision: b6bc2782e23c5b53ebdf2a6a1b48e3f6bfab8e6e
+  branch: hash-type-data2
   specs:
     ckb-sdk-ruby (0.103.0)
       net-http-persistent (~> 4.0.1)
