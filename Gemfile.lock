@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/nervosnetwork/ckb-sdk-ruby.git
-  revision: 1790c72fb886bda3e30936a73bc3d1cbcee6c91f
+  revision: 4b43de58fb69cc046b3cef234d70fd9657711ff6
   branch: develop
   specs:
     ckb-sdk-ruby (0.103.0)
@@ -156,7 +156,7 @@ GEM
     mocha (2.0.2)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.7.0)
-    net-http-persistent (4.0.2)
+    net-http-persistent (4.0.4)
       connection_pool (~> 2.2)
     net-imap (0.3.4)
       date
@@ -175,7 +175,7 @@ GEM
     parser (3.2.2.1)
       ast (~> 2.4.1)
     pg (1.5.3)
-    pkg-config (1.5.6)
+    pkg-config (1.5.7)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -225,8 +225,8 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rbnacl (7.1.1)
-      ffi
+    rbnacl (7.1.2)
+      ffi (~> 1)
     rbsecp256k1 (5.1.1)
       mini_portile2 (~> 2.8)
       pkg-config (~> 1.5)
