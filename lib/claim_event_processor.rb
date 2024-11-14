@@ -11,10 +11,10 @@ require_relative "../config/environment"
 # BalanceUpdater.execute
 
 loop do
-  puts "Check Offical Account Balance Enough"
+  Rails.logger.info "Check Offical Account Balance Enough"
   enough = BalanceEnoughCheckService.new.call
   if enough
-    puts 'Sending capacity'
+    Rails.logger.info 'Sending capacity'
     SendCapacityService.new.call
   end
   sleep(10)
