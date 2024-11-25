@@ -8,16 +8,20 @@ class BalanceEnoughCheckService
 
     total_send_capacity = ClaimEvent.pending.sum(:capacity)
     official_account_balance = Account.official_account.balance
-    if InnerTransfer.tx_pending.exists? || total_send_capacity > official_account_balance
-      less_amount = total_send_capacity - official_account_balance  
-      inner_account = CKB::Wallet.from_hex(api, ENV["INNER_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
-      official_account = CKB::Wallet.from_hex(api,  ENV["OFFICIAL_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
-      transfer_amount = less_amount + DEFAULT_TRANSFER_CAPACITY_AMOUNT
-      tx_hash = inner_account.send_capacity(official_account.address, transfer_amount, fee: 1000)
-      InnerTransfer.create!(tx_hash: tx_hash, amount: transfer_amount)
+    if InnerTransfer.tx_pending.exists? 
       false
     else
-      true
+      if total_send_capacity > official_account_balance
+        less_amount = total_send_capacity - official_account_balance  
+        inner_account = CKB::Wallet.from_hex(api, ENV["INNER_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
+        official_account = CKB::Wallet.from_hex(api,  ENV["OFFICIAL_WALLET_PRIVATE_KEY"], indexer_api: indexer_api)
+        transfer_amount = less_amount + DEFAULT_TRANSFER_CAPACITY_AMOUNT
+        tx_hash = inner_account.send_capacity(official_account.address, transfer_amount.to_i, fee: 1000, outputs_validator: "passthrough")
+        InnerTransfer.create!(tx_hash: tx_hash, amount: transfer_amount.to_i)
+        false
+      else
+        true
+      end
     end
   end
 
